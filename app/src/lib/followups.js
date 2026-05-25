@@ -19,6 +19,22 @@ export const customersApi = {
   remove:   (id)          => api.delete(`/customers/${id}`),
 };
 
+export const ordersApi = {
+  list:           (scope = 'all', q = '') => {
+    const params = new URLSearchParams();
+    if (scope) params.set('scope', scope);
+    if (q)     params.set('q', q);
+    const qs = params.toString();
+    return api.get(`/orders${qs ? `?${qs}` : ''}`);
+  },
+  forCustomer:    (customerId) => api.get(`/orders?scope=customer&customer_id=${customerId}`),
+  create:         (payload)         => api.post('/orders', payload),
+  update:         (id, payload)     => api.patch(`/orders/${id}`, payload),
+  recordPayment:  (id, payload)     => api.post(`/orders/${id}/payment`, payload),
+  snooze:         (id, days = 3)    => api.post(`/orders/${id}/snooze`, { days }),
+  remove:         (id)              => api.delete(`/orders/${id}`),
+};
+
 // Builds a wa.me link with a prefilled message.
 export function whatsappLink(phone, message = '') {
   const clean = String(phone || '').replace(/\D+/g, '');
@@ -38,3 +54,16 @@ export function todayISO() {
   const tz = d.getTimezoneOffset() * 60000;
   return new Date(d - tz).toISOString().slice(0, 10);
 }
+
+export function formatMoney(n) {
+  return Number(n || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2, maximumFractionDigits: 2,
+  });
+}
+
+export const PRODUCT_CATEGORIES = [
+  { value: 'kitchen', label: 'Kitchen' },
+  { value: 'bottle',  label: 'Water bottle' },
+  { value: 'storage', label: 'Storage' },
+  { value: 'other',   label: 'Other' },
+];

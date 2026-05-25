@@ -4,6 +4,7 @@ import Signup from '@/pages/Signup';
 import Home from '@/pages/Home';
 import Customers from '@/pages/Customers';
 import CustomerProfile from '@/pages/CustomerProfile';
+import Payments from '@/pages/Payments';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function App() {
@@ -33,6 +34,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <CustomerProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payments"
+        element={
+          <ProtectedRoute>
+            <Payments />
           </ProtectedRoute>
         }
       />

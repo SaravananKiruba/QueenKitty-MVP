@@ -73,6 +73,7 @@ export default function Home() {
           </Box>
         </HStack>
         <HStack spacing={1}>
+          <Button as={RouterLink} to="/payments" size="sm" variant="ghost">Payments</Button>
           <Button as={RouterLink} to="/customers" size="sm" variant="ghost">Customers</Button>
           <Button size="sm" variant="ghost" onClick={logout}>Log out</Button>
         </HStack>

@@ -7,8 +7,9 @@ import {
 } from '@chakra-ui/react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
-import { customersApi, whatsappLink, telLink } from '@/lib/followups';
+import { customersApi, whatsappLink, telLink, formatMoney } from '@/lib/followups';
 import AddFollowupSheet from '@/components/AddFollowupSheet';
+import AddOrderSheet from '@/components/AddOrderSheet';
 
 export default function CustomerProfile() {
   const { id } = useParams();
@@ -22,6 +23,7 @@ export default function CustomerProfile() {
   const [error, setError]       = useState(null);
 
   const addSheet  = useDisclosure();
+  const orderSheet = useDisclosure();
   const editModal = useDisclosure();
 
   const load = useCallback(async () => {
@@ -110,6 +112,9 @@ export default function CustomerProfile() {
             <Button colorScheme="brand" size="sm" flex="1" onClick={addSheet.onOpen}>
               + Follow-up
             </Button>
+          <Button mt={2} colorScheme="green" size="sm" w="full" onClick={orderSheet.onOpen}>
+            + Record order
+          </Button>
           </HStack>
         </CardBody>
       </Card>
@@ -153,7 +158,13 @@ export default function CustomerProfile() {
       <AddFollowupSheet
         isOpen={addSheet.isOpen}
         onClose={addSheet.onClose}
-        // Prefill is via empty sheet; future improvement: pass customer_id.
+        onCreated={load}
+      />
+
+      <AddOrderSheet
+        isOpen={orderSheet.isOpen}
+        onClose={orderSheet.onClose}
+        customer={customer}
         onCreated={load}
       />
 
@@ -281,10 +292,6 @@ function EditCustomerModal({ isOpen, onClose, customer, onSaved }) {
 }
 
 function formatWhen(ts) {
-  if (!ts) return '';
-  const d = new Date(ts.replace(' ', 'T'));
-  if (Number.isNaN(+d)) return ts;
-  const today = new Date(); today.setHours(0, 0, 0, 0);
   const dDay  = new Date(d);  dDay.setHours(0, 0, 0, 0);
   const diff  = Math.round((today - dDay) / 86400000);
   const time  = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
@@ -294,6 +301,3 @@ function formatWhen(ts) {
   return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function formatMoney(n) {
-  return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
