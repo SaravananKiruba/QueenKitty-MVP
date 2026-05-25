@@ -12,6 +12,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Capacitor — auto-generated, rebuild with: npx cap add android && npm run cap:sync
+/app/android/
+
+# Capacitor web build for mobile (output only)
+/app/dist/
+
 # Build output served by PHP host
 /public/assets
 /public/index.html

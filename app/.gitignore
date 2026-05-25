@@ -4,3 +4,6 @@ dist
 .env
 .env.local
 *.log
+
+# Capacitor Android (auto-generated)
+android/
