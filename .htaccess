@@ -1,0 +1,22 @@
+# Root .htaccess
+# - /api/*  -> handled by /api/.htaccess (PHP front controller)
+# - everything else -> React PWA SPA in /public
+
+RewriteEngine On
+
+# Pass /api requests through untouched (handled by api/.htaccess)
+RewriteRule ^api/ - [L]
+
+# Serve static React build files if they exist
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# SPA fallback: any non-file, non-/api request -> public/index.html
+RewriteRule ^(.*)$ public/index.html [L]
+
+# Basic hardening
+Options -Indexes
+<FilesMatch "\.(env|sql|md|json|lock)$">
+  Require all denied
+</FilesMatch>

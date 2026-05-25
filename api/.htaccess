@@ -1,0 +1,17 @@
+# Front-controller: route every /api/* request to index.php
+RewriteEngine On
+RewriteBase /api/
+
+# Skip real files (uploads, favicons, etc.)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+RewriteRule ^ index.php [QSA,L]
+
+# Hide source files
+<FilesMatch "\.(env|sql|md|json|lock|sqlite)$">
+  Require all denied
+</FilesMatch>
+
+# Deny direct access to internal folders
+RedirectMatch 403 ^/api/(config|core|controllers)(/|$)
