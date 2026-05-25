@@ -35,6 +35,17 @@ export const ordersApi = {
   remove:         (id)              => api.delete(`/orders/${id}`),
 };
 
+export const repeatsApi = {
+  list:    (scope = 'due') => api.get(`/repeats?scope=${encodeURIComponent(scope)}`),
+  snooze:  (id, days = 14) => api.post(`/repeats/${id}/snooze`, { days }),
+  dismiss: (id)            => api.post(`/repeats/${id}/dismiss`),
+};
+
+export const settingsApi = {
+  get:    ()         => api.get('/settings'),
+  update: (payload)  => api.patch('/settings', payload),
+};
+
 // Builds a wa.me link with a prefilled message.
 export function whatsappLink(phone, message = '') {
   const clean = String(phone || '').replace(/\D+/g, '');

@@ -5,6 +5,8 @@ import Home from '@/pages/Home';
 import Customers from '@/pages/Customers';
 import CustomerProfile from '@/pages/CustomerProfile';
 import Payments from '@/pages/Payments';
+import Repeats from '@/pages/Repeats';
+import Settings from '@/pages/Settings';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function App() {
@@ -42,6 +44,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Payments />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/repeats"
+        element={
+          <ProtectedRoute>
+            <Repeats />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         }
       />

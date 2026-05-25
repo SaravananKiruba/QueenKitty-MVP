@@ -398,26 +398,7 @@ Do NOT overengineer.
 
 ---
 
-## FEATURE 5 — REFERRAL / INVITE SYSTEM
 
-Seller growth engine.
-
-Example:
-
-Priya invites Kavya.
-
-Kavya joins.
-
-Reward:
-- commission
-OR
-- free subscription days
-
-Referral must be lightweight.
-
-Avoid MLM complexity.
-
----
 
 # AUTHENTICATION
 

@@ -133,8 +133,8 @@ final class OrderController
 
         $pending = max(0.0, $amount - $paid);
 
-        // Default repeat-date by category (Feature 4 will reuse this)
-        $repeatDays = self::repeatDaysFor($category);
+        // Default repeat-date by category (Feature 4 — configurable per seller).
+        $repeatDays = UserSettings::repeatDaysFor($userId, $category);
         $nextRepeat = $repeatDays > 0
             ? date('Y-m-d', strtotime($orderDate . " +{$repeatDays} days"))
             : null;
@@ -358,16 +358,5 @@ final class OrderController
     private static function money($n): float
     {
         return round((float) $n, 2);
-    }
-
-    /** Repeat-order defaults from CLAUDE.md Feature 4 (kept here for reuse). */
-    private static function repeatDaysFor(string $category): int
-    {
-        return match ($category) {
-            'kitchen' => 90,
-            'bottle'  => 120,
-            'storage' => 180,
-            default   => 0,
-        };
     }
 }

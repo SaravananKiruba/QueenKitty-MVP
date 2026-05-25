@@ -42,3 +42,12 @@ $router->patch('/orders/{id}',              [new OrderController(), 'update']);
 $router->post('/orders/{id}/payment',       [new OrderController(), 'recordPayment']);
 $router->post('/orders/{id}/snooze',        [new OrderController(), 'snoozeReminder']);
 $router->delete('/orders/{id}',             [new OrderController(), 'destroy']);
+
+// --- Repeat-order reminders (Feature 4) ------------------------------
+$router->get('/repeats',                    [new RepeatController(), 'index']);
+$router->post('/repeats/{id}/snooze',       [new RepeatController(), 'snooze']);
+$router->post('/repeats/{id}/dismiss',      [new RepeatController(), 'dismiss']);
+
+// --- Settings (Feature 4 — configurable cadences) --------------------
+$router->get('/settings',                   [new SettingsController(), 'show']);
+$router->patch('/settings',                 [new SettingsController(), 'update']);

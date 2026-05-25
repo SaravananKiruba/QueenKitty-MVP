@@ -1,7 +1,7 @@
 import {
   Box, Heading, Text, Stack, Button, HStack, Avatar, IconButton, Spinner,
   Tabs, TabList, TabPanels, Tab, TabPanel, Badge, useDisclosure, Card, CardBody,
-  Flex,
+  Flex, Menu, MenuButton, MenuList, MenuItem, MenuDivider,
 } from '@chakra-ui/react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -73,9 +73,18 @@ export default function Home() {
           </Box>
         </HStack>
         <HStack spacing={1}>
+          <Button as={RouterLink} to="/repeats" size="sm" variant="ghost">Repeats</Button>
           <Button as={RouterLink} to="/payments" size="sm" variant="ghost">Payments</Button>
-          <Button as={RouterLink} to="/customers" size="sm" variant="ghost">Customers</Button>
-          <Button size="sm" variant="ghost" onClick={logout}>Log out</Button>
+          <Menu>
+            <MenuButton as={IconButton} variant="ghost" size="sm" aria-label="More"
+              icon={<Text fontSize="lg" lineHeight="1">⋮</Text>} />
+            <MenuList>
+              <MenuItem as={RouterLink} to="/customers">Customers</MenuItem>
+              <MenuItem as={RouterLink} to="/settings">Settings</MenuItem>
+              <MenuDivider />
+              <MenuItem onClick={logout}>Log out</MenuItem>
+            </MenuList>
+          </Menu>
         </HStack>
       </HStack>
 

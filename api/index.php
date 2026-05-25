@@ -13,6 +13,7 @@ require __DIR__ . '/core/Response.php';
 require __DIR__ . '/core/Request.php';
 require __DIR__ . '/core/Cors.php';
 require __DIR__ . '/core/Auth.php';
+require __DIR__ . '/core/UserSettings.php';
 require __DIR__ . '/core/Router.php';
 
 // Autoload controllers (tiny, MVP-friendly — no Composer)
