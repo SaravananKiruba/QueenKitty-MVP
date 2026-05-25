@@ -112,10 +112,10 @@ export default function CustomerProfile() {
             <Button colorScheme="brand" size="sm" flex="1" onClick={addSheet.onOpen}>
               + Follow-up
             </Button>
+          </HStack>
           <Button mt={2} colorScheme="green" size="sm" w="full" onClick={orderSheet.onOpen}>
             + Record order
           </Button>
-          </HStack>
         </CardBody>
       </Card>
 
@@ -292,7 +292,9 @@ function EditCustomerModal({ isOpen, onClose, customer, onSaved }) {
 }
 
 function formatWhen(ts) {
-  const dDay  = new Date(d);  dDay.setHours(0, 0, 0, 0);
+  const d     = new Date(ts);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const dDay  = new Date(ts); dDay.setHours(0, 0, 0, 0);
   const diff  = Math.round((today - dDay) / 86400000);
   const time  = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   if (diff === 0) return `Today, ${time}`;
