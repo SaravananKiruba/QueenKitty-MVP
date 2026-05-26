@@ -4,16 +4,21 @@ const theme = extendTheme({
   config: { initialColorMode: 'light', useSystemColorMode: false },
   colors: {
     brand: {
-      50:  '#FFF0F5',
-      100: '#FFD6E7',
-      200: '#FFADD0',
-      300: '#FF85B8',
-      400: '#FF5C9F',
-      500: '#E91E63',
-      600: '#C4175A',
-      700: '#9C0F49',
-      800: '#740A37',
-      900: '#4D0525',
+      50:  '#F5F0FF',
+      100: '#EDE0FF',
+      200: '#D4BBFF',
+      300: '#B38FFF',
+      400: '#9B59E8',
+      500: '#7C3AED',
+      600: '#6B21A8',
+      700: '#581C8E',
+      800: '#431574',
+      900: '#2E0F52',
+    },
+    gold: {
+      400: '#FBBF24',
+      500: '#F59E0B',
+      600: '#D97706',
     },
     whatsapp: {
       50:  '#EDFDF4',
@@ -29,7 +34,7 @@ const theme = extendTheme({
     global: {
       'html, body, #root': {
         height: '100%',
-        bg: '#FFF5F8',
+        bg: '#F5F0FF',
       },
     },
   },
