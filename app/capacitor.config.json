@@ -3,7 +3,7 @@
   "appName": "QueenKitty",
   "webDir": "dist",
   "server": {
-    "androidScheme": "http"
+    "androidScheme": "https"
   },
   "android": {
     "allowMixedContent": true
