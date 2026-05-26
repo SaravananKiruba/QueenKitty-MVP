@@ -1,10 +1,12 @@
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
   FormControl, FormLabel, FormErrorMessage, Input, Stack, Button, HStack, Select,
-  InputGroup, InputLeftAddon, useToast,
+  InputGroup, InputLeftAddon, useToast, Divider, Text,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { ordersApi, todayISO, PRODUCT_CATEGORIES } from '@/lib/followups';
+import CustomerSearchSelector from '@/components/CustomerSearchSelector';
+import ProductSearchSelector from '@/components/ProductSearchSelector';
 
 const empty = {
   name: '', phone: '',
@@ -71,6 +73,25 @@ export default function AddOrderSheet({ isOpen, onClose, onCreated, customer = n
           <Stack spacing={3}>
             {!customer && (
               <>
+                {/* ── Optional: search existing customer to auto-fill name+phone ── */}
+                <CustomerSearchSelector
+                  label="Search existing customer (optional)"
+                  placeholder="Name or phone…"
+                  onSelect={(c) =>
+                    setForm((f) => ({
+                      ...f,
+                      name:  c.name  || f.name,
+                      phone: c.phone || f.phone,
+                    }))
+                  }
+                />
+                <HStack spacing={2} align="center">
+                  <Divider />
+                  <Text fontSize="xs" color="gray.400" whiteSpace="nowrap">or add new</Text>
+                  <Divider />
+                </HStack>
+                {/* ── End customer search ──────────────────────────────────────── */}
+
                 <FormControl isRequired isInvalid={!!errors.name}>
                   <FormLabel fontSize="sm">Customer name</FormLabel>
                   <Input ref={nameRef} value={form.name} onChange={set('name')} placeholder="Lakshmi" />
@@ -83,6 +104,27 @@ export default function AddOrderSheet({ isOpen, onClose, onCreated, customer = n
                 </FormControl>
               </>
             )}
+
+            {/* ── Optional: search product master to auto-fill name + amount ── */}
+            <ProductSearchSelector
+              label="Search product (optional)"
+              placeholder="Product name or code…"
+              onSelect={(p) =>
+                setForm((f) => ({
+                  ...f,
+                  product_name:     p.product_name || f.product_name,
+                  product_category: p.category     || f.product_category,
+                  // Pre-fill amount from MRP only when seller hasn't typed one yet
+                  amount: f.amount === '' && p.default_price ? String(p.default_price) : f.amount,
+                }))
+              }
+            />
+            <HStack spacing={2} align="center">
+              <Divider />
+              <Text fontSize="xs" color="gray.400" whiteSpace="nowrap">or type manually</Text>
+              <Divider />
+            </HStack>
+            {/* ── End product search ───────────────────────────────────────────── */}
 
             <FormControl isRequired isInvalid={!!errors.product_name}>
               <FormLabel fontSize="sm">Product</FormLabel>

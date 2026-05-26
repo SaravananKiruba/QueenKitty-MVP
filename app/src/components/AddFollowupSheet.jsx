@@ -1,9 +1,11 @@
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
   FormControl, FormLabel, FormErrorMessage, Input, Stack, Button, Textarea, HStack, useToast,
+  Divider, Text,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { followupsApi, todayISO } from '@/lib/followups';
+import CustomerSearchSelector from '@/components/CustomerSearchSelector';
 
 const empty = { name: '', phone: '', product_interest: '', followup_date: '', notes: '', area: '' };
 
@@ -54,6 +56,26 @@ export default function AddFollowupSheet({ isOpen, onClose, onCreated }) {
         <ModalCloseButton />
         <ModalBody>
           <Stack spacing={3}>
+            {/* ── Optional: search existing customer to auto-fill fields below ── */}
+            <CustomerSearchSelector
+              label="Search existing customer (optional)"
+              placeholder="Name or phone…"
+              onSelect={(c) =>
+                setForm((f) => ({
+                  ...f,
+                  name:  c.name  || f.name,
+                  phone: c.phone || f.phone,
+                  area:  c.area  || f.area,
+                }))
+              }
+            />
+            <HStack spacing={2} align="center">
+              <Divider />
+              <Text fontSize="xs" color="gray.400" whiteSpace="nowrap">or add new</Text>
+              <Divider />
+            </HStack>
+            {/* ── End customer search ─────────────────────────────────────────── */}
+
             <FormControl isRequired isInvalid={!!errors.name}>
               <FormLabel fontSize="sm">Customer name</FormLabel>
               <Input ref={nameRef} value={form.name} onChange={set('name')} placeholder="Lakshmi" />

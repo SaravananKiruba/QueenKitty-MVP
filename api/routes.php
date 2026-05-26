@@ -51,3 +51,9 @@ $router->post('/repeats/{id}/dismiss',      [new RepeatController(), 'dismiss'])
 // --- Settings (Feature 4 — configurable cadences) --------------------
 $router->get('/settings',                   [new SettingsController(), 'show']);
 $router->patch('/settings',                 [new SettingsController(), 'update']);
+
+// --- Products (Feature 2 — product master + search) ------------------
+$router->get('/products',                   [new ProductController(), 'index']);
+$router->post('/products',                  [new ProductController(), 'store']);
+$router->patch('/products/{id}',            [new ProductController(), 'update']);
+$router->delete('/products/{id}',           [new ProductController(), 'destroy']);

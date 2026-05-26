@@ -46,6 +46,13 @@ export const settingsApi = {
   update: (payload)  => api.patch('/settings', payload),
 };
 
+export const productsApi = {
+  search: (q = '') => api.get(`/products${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  create: (payload) => api.post('/products', payload),
+  update: (id, payload) => api.patch(`/products/${id}`, payload),
+  remove: (id) => api.delete(`/products/${id}`),
+};
+
 // Builds a wa.me link with a prefilled message.
 export function whatsappLink(phone, message = '') {
   const clean = String(phone || '').replace(/\D+/g, '');
