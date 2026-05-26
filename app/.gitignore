@@ -3,6 +3,7 @@ dist
 .vite
 .env
 .env.local
+.env.mobile
 *.log
 
 # Capacitor Android (auto-generated)

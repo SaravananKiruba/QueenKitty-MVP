@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:mobile": "vite build --outDir dist",
+    "build:mobile": "vite build --outDir dist --mode mobile",
     "preview": "vite preview",
     "cap:sync": "npm run build:mobile && npx cap sync android",
     "cap:open": "npx cap open android"

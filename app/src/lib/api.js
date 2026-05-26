@@ -1,5 +1,11 @@
 // Tiny fetch wrapper. Reads token from localStorage and attaches Authorization.
 // All API responses follow { success, message, data } per CLAUDE.md.
+//
+// VITE_API_BASE_URL:
+//   - Web (shared hosting): leave empty — relative /api paths work fine.
+//   - Mobile APK (Capacitor): set to https://yourdomain.com in .env.mobile
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
 const TOKEN_KEY = 'qk_token';
 
@@ -12,7 +18,7 @@ async function request(method, path, body) {
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}/api${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,

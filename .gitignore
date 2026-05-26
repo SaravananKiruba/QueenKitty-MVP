@@ -3,6 +3,7 @@
 /api/config/env.php
 .env
 .env.local
+.env.mobile
 
 # Frontend
 /app/node_modules
