@@ -59,17 +59,32 @@ export default function CustomerProfile() {
   }
   if (error || !customer) {
     return (
-      <Box maxW="md" mx="auto" px={4} py={6}>
-        <Button as={RouterLink} to="/" variant="ghost" mb={4}>← Back</Button>
+      <Box px={4} py={6}>
+        <Button as={RouterLink} to="/customers" variant="ghost" mb={4}>← Customers</Button>
         <Card><CardBody><Text color="red.500">{error || 'Not found'}</Text></CardBody></Card>
       </Box>
     );
   }
 
   return (
-    <Box maxW="md" mx="auto" px={4} pt={4} pb={28} minH="100vh">
-      <HStack justify="space-between" mb={3}>
-        <Button as={RouterLink} to="/" variant="ghost" size="sm">← Back</Button>
+    <Box minH={{ md: '100vh' }}>
+      {/* Gradient header with customer info */}
+      <Box
+        bgGradient="linear(135deg, #E91E63 0%, #FF6B9D 100%)"
+        px={5} pt={{ base: 6, md: 8 }} pb={20}
+      >
+        <HStack justify="space-between" mb={5}>
+          <Button
+            as={RouterLink}
+            to="/customers"
+            size="sm"
+            bg="whiteAlpha.200"
+            color="white"
+            _hover={{ bg: 'whiteAlpha.300' }}
+            rounded="lg"
+          >
+            ← Back
+          </Button>
         <Menu>
           <MenuButton as={IconButton} variant="ghost" size="sm" aria-label="More"
             icon={<Text fontSize="lg" lineHeight="1">⋮</Text>} />
@@ -78,82 +93,99 @@ export default function CustomerProfile() {
             <MenuItem color="red.500" onClick={remove}>Delete customer</MenuItem>
           </MenuList>
         </Menu>
-      </HStack>
-
-      {/* Header */}
-      <Card rounded="2xl" shadow="sm" mb={4}>
-        <CardBody>
-          <HStack spacing={3} align="start">
-            <Avatar name={customer.name} bg="brand.500" color="white" size="lg" />
-            <Box flex="1">
-              <Heading size="md">{customer.name}</Heading>
-              <Text color="gray.600" fontSize="sm">{customer.phone}</Text>
-              {customer.area && (
-                <Text color="gray.500" fontSize="sm">{customer.area}</Text>
-              )}
-            </Box>
-          </HStack>
-
-          <HStack mt={4} spacing={2}>
-            <Button
-              as="a"
-              href={whatsappLink(customer.phone)}
-              target="_blank"
-              rel="noopener noreferrer"
-              colorScheme="whatsapp"
-              size="sm"
-              flex="1"
-            >
-              WhatsApp
-            </Button>
-            <Button as="a" href={telLink(customer.phone)} variant="outline" size="sm" flex="1">
-              Call
-            </Button>
-            <Button colorScheme="brand" size="sm" flex="1" onClick={addSheet.onOpen}>
-              + Follow-up
-            </Button>
-          </HStack>
-          <Button mt={2} colorScheme="green" size="sm" w="full" onClick={orderSheet.onOpen}>
-            + Record order
-          </Button>
-        </CardBody>
-      </Card>
-
-      {/* Stats */}
-      {stats && (
-        <HStack spacing={2} mb={4} overflowX="auto" sx={{ scrollbarWidth: 'none' }}>
-          <StatPill label="Open" value={stats.open_followups} />
-          <StatPill label="Done" value={stats.done_followups} />
-          <StatPill label="Orders" value={stats.total_orders} />
-          {stats.pending_total > 0 && (
-            <StatPill label="Pending" value={`₹${formatMoney(stats.pending_total)}`} tone="red" />
-          )}
         </HStack>
-      )}
 
-      {/* Timeline */}
-      <Heading size="sm" mb={3} color="gray.700">Timeline</Heading>
-      {events.length === 0 ? (
-        <Card rounded="2xl">
-          <CardBody>
-            <Text color="gray.600" fontSize="sm">
-              No history yet. Add a follow-up to start tracking.
-            </Text>
+        {/* Customer info in gradient */}
+        <HStack spacing={3} align="start">
+          <Avatar name={customer.name} bg="whiteAlpha.300" color="white" size="xl"
+            border="3px solid" borderColor="whiteAlpha.400" />
+          <Box flex="1">
+            <Heading size="lg" color="white" fontFamily="heading">{customer.name}</Heading>
+            <Text color="whiteAlpha.800" fontSize="sm">{customer.phone}</Text>
+            {customer.area && <Text color="whiteAlpha.700" fontSize="sm">{customer.area}</Text>}
+          </Box>
+        </HStack>
+      </Box>
+
+      {/* Content lifts over gradient */}
+      <Box
+        bg="#FFF5F8"
+        borderTopLeftRadius="28px"
+        borderTopRightRadius="28px"
+        mt="-14px"
+        pt={4}
+        px={4}
+        pb={24}
+        minH="60vh"
+      >
+        {/* Action buttons */}
+        <Card rounded="2xl" mb={4}>
+          <CardBody py={3}>
+            <HStack spacing={2}>
+              <Button
+                as="a"
+                href={whatsappLink(customer.phone)}
+                target="_blank"
+                rel="noopener noreferrer"
+                colorScheme="whatsapp"
+                size="sm"
+                flex="1"
+              >
+                WhatsApp
+              </Button>
+              <Button as="a" href={telLink(customer.phone)} variant="outline" size="sm" flex="1">
+                Call
+              </Button>
+              <Button colorScheme="brand" size="sm" flex="1" onClick={addSheet.onOpen}>
+                + Follow-up
+              </Button>
+            </HStack>
+            <Button mt={2} colorScheme="green" size="sm" w="full" onClick={orderSheet.onOpen}>
+              + Record order
+            </Button>
           </CardBody>
         </Card>
-      ) : (
-        <Timeline events={events} />
-      )}
 
-      {customer.notes && (
-        <>
-          <Divider my={5} />
-          <Heading size="sm" mb={2} color="gray.700">Notes</Heading>
-          <Card rounded="2xl"><CardBody>
-            <Text fontSize="sm" whiteSpace="pre-wrap">{customer.notes}</Text>
-          </CardBody></Card>
-        </>
-      )}
+        {/* Stats */}
+        {stats && (
+          <HStack spacing={2} mb={4} overflowX="auto" sx={{ scrollbarWidth: 'none' }}>
+            <StatPill label="Open" value={stats.open_followups} />
+            <StatPill label="Done" value={stats.done_followups} />
+            <StatPill label="Orders" value={stats.total_orders} />
+            {stats.pending_total > 0 && (
+              <StatPill label="Pending" value={`₹${formatMoney(stats.pending_total)}`} tone="red" />
+            )}
+          </HStack>
+        )}
+
+        {/* Timeline */}
+        <Heading size="sm" mb={3} color="gray.600" fontWeight="600" textTransform="uppercase" letterSpacing="wider" fontSize="xs">
+          Timeline
+        </Heading>
+        {events.length === 0 ? (
+          <Card rounded="2xl">
+            <CardBody>
+              <Text color="gray.500" fontSize="sm">
+                No history yet. Add a follow-up to start tracking.
+              </Text>
+            </CardBody>
+          </Card>
+        ) : (
+          <Timeline events={events} />
+        )}
+
+        {customer.notes && (
+          <>
+            <Divider my={5} />
+            <Heading size="sm" mb={2} color="gray.600" fontWeight="600" textTransform="uppercase" letterSpacing="wider" fontSize="xs">
+              Notes
+            </Heading>
+            <Card rounded="2xl"><CardBody>
+              <Text fontSize="sm" whiteSpace="pre-wrap">{customer.notes}</Text>
+            </CardBody></Card>
+          </>
+        )}
+      </Box>
 
       <AddFollowupSheet
         isOpen={addSheet.isOpen}
@@ -181,15 +213,20 @@ export default function CustomerProfile() {
 function StatPill({ label, value, tone = 'gray' }) {
   return (
     <Box
-      rounded="full"
+      rounded="2xl"
       px={4}
       py={2}
-      bg={tone === 'red' ? 'red.50' : 'gray.100'}
-      color={tone === 'red' ? 'red.700' : 'gray.700'}
+      bg={tone === 'red' ? 'red.50' : 'brand.50'}
+      color={tone === 'red' ? 'red.700' : 'brand.700'}
       flexShrink={0}
+      border="1px solid"
+      borderColor={tone === 'red' ? 'red.100' : 'brand.100'}
     >
-      <Text fontSize="xs" color={tone === 'red' ? 'red.600' : 'gray.500'}>{label}</Text>
-      <Text fontWeight="bold" fontSize="sm">{value}</Text>
+      <Text fontSize="9px" fontWeight="600" textTransform="uppercase" letterSpacing="wider"
+        color={tone === 'red' ? 'red.500' : 'brand.400'}>
+        {label}
+      </Text>
+      <Text fontWeight="700" fontSize="md" lineHeight="1.2">{value}</Text>
     </Box>
   );
 }

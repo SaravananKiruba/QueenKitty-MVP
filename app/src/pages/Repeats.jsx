@@ -42,53 +42,83 @@ export default function Repeats() {
   const scopeIndex = SCOPES.findIndex((s) => s.key === scope);
 
   return (
-    <Box maxW="md" mx="auto" px={4} pt={6} pb={20} minH="100vh">
-      <HStack justify="space-between" mb={4}>
-        <Button as={RouterLink} to="/" variant="ghost" size="sm">← Back</Button>
-        <Heading size="md">Repeat orders</Heading>
-        <Button as={RouterLink} to="/settings" variant="ghost" size="sm">Settings</Button>
-      </HStack>
-
-      <Tabs
-        index={scopeIndex >= 0 ? scopeIndex : 0}
-        onChange={(i) => setScope(SCOPES[i].key)}
-        variant="soft-rounded"
-        colorScheme="brand"
-        isLazy
+    <Box minH={{ md: '100vh' }}>
+      {/* Gradient header */}
+      <Box
+        bgGradient="linear(135deg, #E91E63 0%, #FF6B9D 100%)"
+        px={5} pt={{ base: 7, md: 8 }} pb={16}
       >
-        <TabList overflowX="auto" pb={2} sx={{ scrollbarWidth: 'none' }}>
-          {SCOPES.map((s) => (
-            <Tab key={s.key} flexShrink={0} fontSize="sm">
-              {s.label}
-              {(s.key === 'due' || s.key === 'upcoming') && counts[s.key] > 0 && (
-                <Badge ml={2} colorScheme={s.key === 'due' ? 'red' : 'brand'} rounded="full">
-                  {counts[s.key]}
-                </Badge>
-              )}
-            </Tab>
-          ))}
-        </TabList>
+        <HStack justify="space-between" align="start">
+          <Box>
+            <Heading size="lg" color="white" fontFamily="heading">Repeat Orders</Heading>
+            <Text fontSize="sm" color="whiteAlpha.800" mt={0.5}>Re-engage customers on time</Text>
+          </Box>
+          <Button
+            as={RouterLink}
+            to="/settings"
+            size="xs"
+            bg="whiteAlpha.200"
+            color="white"
+            _hover={{ bg: 'whiteAlpha.300' }}
+            rounded="lg"
+          >
+            Settings
+          </Button>
+        </HStack>
+      </Box>
 
-        <TabPanels>
-          {SCOPES.map((s) => (
-            <TabPanel key={s.key} px={0} pt={3}>
-              {loading ? (
-                <Flex justify="center" py={10}><Spinner color="brand.500" /></Flex>
-              ) : error ? (
-                <Card><CardBody><Text color="red.500" fontSize="sm">{error}</Text></CardBody></Card>
-              ) : items.length === 0 ? (
-                <EmptyState scope={s.key} />
-              ) : (
-                <Stack spacing={3}>
-                  {items.map((r) => (
-                    <RepeatCard key={r.id} item={r} onChanged={() => load(scope)} />
-                  ))}
-                </Stack>
-              )}
-            </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
+      {/* Content lifts over gradient */}
+      <Box
+        bg="#FFF5F8"
+        borderTopLeftRadius="28px"
+        borderTopRightRadius="28px"
+        mt="-14px"
+        pt={4}
+        px={4}
+        pb={6}
+        minH="60vh"
+      >
+        <Tabs
+          index={scopeIndex >= 0 ? scopeIndex : 0}
+          onChange={(i) => setScope(SCOPES[i].key)}
+          variant="soft-rounded"
+          colorScheme="brand"
+          isLazy
+        >
+          <TabList overflowX="auto" pb={2} sx={{ scrollbarWidth: 'none' }}>
+            {SCOPES.map((s) => (
+              <Tab key={s.key} flexShrink={0} fontSize="sm" fontWeight="500">
+                {s.label}
+                {(s.key === 'due' || s.key === 'upcoming') && counts[s.key] > 0 && (
+                  <Badge ml={2} colorScheme={s.key === 'due' ? 'red' : 'brand'} rounded="full" fontSize="10px">
+                    {counts[s.key]}
+                  </Badge>
+                )}
+              </Tab>
+            ))}
+          </TabList>
+
+          <TabPanels>
+            {SCOPES.map((s) => (
+              <TabPanel key={s.key} px={0} pt={3}>
+                {loading ? (
+                  <Flex justify="center" py={10}><Spinner color="brand.500" /></Flex>
+                ) : error ? (
+                  <Card><CardBody><Text color="red.500" fontSize="sm">{error}</Text></CardBody></Card>
+                ) : items.length === 0 ? (
+                  <EmptyState scope={s.key} />
+                ) : (
+                  <Stack spacing={3}>
+                    {items.map((r) => (
+                      <RepeatCard key={r.id} item={r} onChanged={() => load(scope)} />
+                    ))}
+                  </Stack>
+                )}
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
+      </Box>
     </Box>
   );
 }

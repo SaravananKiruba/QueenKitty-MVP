@@ -4,7 +4,6 @@ import {
   useToast, Flex,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import { settingsApi } from '@/lib/followups';
 
 const CATEGORIES = [
@@ -61,56 +60,72 @@ export default function Settings() {
   };
 
   return (
-    <Box maxW="md" mx="auto" px={4} pt={6} pb={20} minH="100vh">
-      <HStack justify="space-between" mb={4}>
-        <Button as={RouterLink} to="/" variant="ghost" size="sm">← Back</Button>
-        <Heading size="md">Settings</Heading>
-        <Box w="60px" />
-      </HStack>
+    <Box minH={{ md: '100vh' }}>
+      {/* Gradient header */}
+      <Box
+        bgGradient="linear(135deg, #E91E63 0%, #FF6B9D 100%)"
+        px={5} pt={{ base: 7, md: 8 }} pb={16}
+      >
+        <Heading size="lg" color="white" fontFamily="heading">Settings</Heading>
+        <Text fontSize="sm" color="whiteAlpha.800" mt={0.5}>Repeat order reminder cadence</Text>
+      </Box>
 
-      <Card rounded="2xl" mb={3}>
-        <CardBody>
-          <Heading size="sm" mb={1}>Repeat-order reminders</Heading>
-          <Text color="gray.600" fontSize="sm">
-            How many days after a sale should we remind you to follow up for a repeat order?
-          </Text>
-        </CardBody>
-      </Card>
-
-      {loading ? (
-        <Flex justify="center" py={10}><Spinner color="brand.500" /></Flex>
-      ) : error ? (
-        <Card><CardBody><Text color="red.500" fontSize="sm">{error}</Text></CardBody></Card>
-      ) : (
-        <Card rounded="2xl">
-          <CardBody>
-            <Stack spacing={4}>
-              {CATEGORIES.map(({ key, label, hint }) => (
-                <FormControl key={key}>
-                  <FormLabel fontSize="sm" mb={1}>{label}</FormLabel>
-                  <InputGroup>
-                    <Input
-                      type="number" inputMode="numeric"
-                      min={MIN} max={MAX}
-                      value={days[key]}
-                      onChange={set(key)}
-                    />
-                    <InputRightAddon>days</InputRightAddon>
-                  </InputGroup>
-                  <FormHelperText fontSize="xs">{hint}</FormHelperText>
-                </FormControl>
-              ))}
-
-              <Button colorScheme="brand" onClick={save} isLoading={saving} isDisabled={!valid}>
-                Save settings
-              </Button>
-              <Text fontSize="xs" color="gray.500">
-                Changes apply to new orders. Existing orders keep their original reminder dates.
-              </Text>
-            </Stack>
+      {/* Content lifts over gradient */}
+      <Box
+        bg="#FFF5F8"
+        borderTopLeftRadius="28px"
+        borderTopRightRadius="28px"
+        mt="-14px"
+        pt={4}
+        px={4}
+        pb={6}
+        minH="60vh"
+      >
+        <Card rounded="2xl" mb={4} shadow="none" bg="brand.50" borderWidth="1px" borderColor="brand.100">
+          <CardBody py={3}>
+            <Text fontSize="sm" color="brand.700">
+              How many days after a sale should we remind you to follow up for a repeat order?
+            </Text>
           </CardBody>
         </Card>
-      )}
+
+        {loading ? (
+          <Flex justify="center" py={10}><Spinner color="brand.500" /></Flex>
+        ) : error ? (
+          <Card><CardBody><Text color="red.500" fontSize="sm">{error}</Text></CardBody></Card>
+        ) : (
+          <Card rounded="2xl">
+            <CardBody>
+              <Stack spacing={4}>
+                {CATEGORIES.map(({ key, label, hint }) => (
+                  <FormControl key={key}>
+                    <FormLabel fontSize="sm" fontWeight="600" color="gray.700" mb={1}>{label}</FormLabel>
+                    <InputGroup>
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        min={MIN} max={MAX}
+                        value={days[key]}
+                        onChange={set(key)}
+                        bg="white"
+                      />
+                      <InputRightAddon bg="gray.50" color="gray.500">days</InputRightAddon>
+                    </InputGroup>
+                    <FormHelperText fontSize="xs" color="gray.400">{hint}</FormHelperText>
+                  </FormControl>
+                ))}
+
+                <Button colorScheme="brand" onClick={save} isLoading={saving} isDisabled={!valid} size="lg">
+                  Save settings
+                </Button>
+                <Text fontSize="xs" color="gray.400">
+                  Changes apply to new orders only.
+                </Text>
+              </Stack>
+            </CardBody>
+          </Card>
+        )}
+      </Box>
     </Box>
   );
 }

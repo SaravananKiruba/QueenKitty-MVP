@@ -1,4 +1,4 @@
-import {
+﻿import {
   Card, CardBody, Stack, HStack, Text, Badge, IconButton, Button, Box,
   Menu, MenuButton, MenuList, MenuItem, useDisclosure,
   AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
@@ -58,48 +58,54 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
   };
 
   return (
-    <Card rounded="2xl" shadow="sm" borderWidth={overdue ? '1px' : 0} borderColor="red.200">
+    <Card
+      rounded="2xl"
+      borderLeft="4px solid"
+      borderColor={followup.is_completed ? 'green.300' : overdue ? 'red.400' : 'brand.400'}
+      shadow="0 2px 12px rgba(0,0,0,0.06)"
+      _hover={{ shadow: '0 4px 20px rgba(233,30,99,0.10)', transform: 'translateY(-1px)' }}
+      transition="all 0.15s"
+    >
       <CardBody>
         <Stack spacing={3}>
           <HStack justify="space-between" align="start">
-            <Box>
-              <HStack spacing={2} mb={1}>
+            <Box flex={1}>
+              <HStack spacing={2} mb={1} flexWrap="wrap">
                 <Badge
                   colorScheme={overdue ? 'red' : followup.is_completed ? 'green' : 'brand'}
                   rounded="full"
                   px={2}
+                  fontSize="11px"
+                  fontWeight="600"
                 >
-                  {followup.is_completed ? 'Done' : relativeDay(followup.followup_date)}
+                  {followup.is_completed ? 'âœ“ Done' : relativeDay(followup.followup_date)}
                 </Badge>
-                <Text fontSize="xs" color="gray.500">{formatDate(followup.followup_date)}</Text>
+                <Text fontSize="xs" color="gray.400" fontWeight="500">{formatDate(followup.followup_date)}</Text>
               </HStack>
-              <Text fontWeight="bold" fontSize="lg" lineHeight="short">
-                <Link as={RouterLink} to={`/customers/${followup.customer_id}`} _hover={{ textDecoration: 'underline' }}>
+              <Text fontWeight="700" fontSize="md" lineHeight="short" color="gray.800">
+                <Link as={RouterLink} to={`/customers/${followup.customer_id}`}
+                  _hover={{ textDecoration: 'underline', color: 'brand.500' }}>
                   {followup.customer_name}
                 </Link>
               </Text>
-              <Text color="gray.700" fontSize="sm">{followup.product_interest}</Text>
+              <Text color="gray.600" fontSize="sm" fontWeight="500">{followup.product_interest}</Text>
               {followup.notes && (
-                <Text color="gray.500" fontSize="sm" fontStyle="italic" mt={1}>
-                  “{followup.notes}”
+                <Text color="gray.400" fontSize="sm" fontStyle="italic" mt={1} noOfLines={2}>
+                  "{followup.notes}"
                 </Text>
               )}
             </Box>
 
             <Menu>
               <MenuButton as={IconButton} variant="ghost" size="sm" aria-label="More"
-                icon={<Text fontSize="lg" lineHeight="1">⋮</Text>} />
-              <MenuList>
-                <MenuItem onClick={() => act(() => followupsApi.snooze(followup.id, 1))}>
-                  Snooze 1 day
-                </MenuItem>
-                <MenuItem onClick={() => act(() => followupsApi.snooze(followup.id, 3))}>
-                  Snooze 3 days
-                </MenuItem>
-                <MenuItem onClick={() => act(() => followupsApi.snooze(followup.id, 7))}>
-                  Snooze 1 week
-                </MenuItem>
-                <MenuItem color="red.500" onClick={openConfirm}>Delete</MenuItem>
+                color="gray.400"
+                _hover={{ color: 'gray.600', bg: 'gray.50' }}
+                icon={<Text fontSize="lg" lineHeight="1">â‹®</Text>} />
+              <MenuList shadow="lg" rounded="xl">
+                <MenuItem rounded="lg" onClick={() => act(() => followupsApi.snooze(followup.id, 1))}>Snooze 1 day</MenuItem>
+                <MenuItem rounded="lg" onClick={() => act(() => followupsApi.snooze(followup.id, 3))}>Snooze 3 days</MenuItem>
+                <MenuItem rounded="lg" onClick={() => act(() => followupsApi.snooze(followup.id, 7))}>Snooze 1 week</MenuItem>
+                <MenuItem rounded="lg" color="red.500" onClick={openConfirm}>Delete</MenuItem>
               </MenuList>
             </Menu>
           </HStack>
@@ -114,6 +120,7 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
                 colorScheme="whatsapp"
                 size="sm"
                 flex="1"
+                rounded="lg"
               >
                 WhatsApp
               </Button>
@@ -123,6 +130,8 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
                 variant="outline"
                 size="sm"
                 flex="1"
+                rounded="lg"
+                borderColor="gray.200"
               >
                 Call
               </Button>
@@ -133,8 +142,9 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
                 isLoading={busy}
                 onClick={() => act(() => followupsApi.done(followup.id))}
                 flex="1"
+                rounded="lg"
               >
-                Done
+                âœ“ Done
               </Button>
             </HStack>
           )}
@@ -143,9 +153,9 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
 
       <AlertDialog isOpen={confirmOpen} leastDestructiveRef={cancelRef} onClose={closeConfirm} isCentered>
         <AlertDialogOverlay>
-          <AlertDialogContent rounded="2xl" mx={4}>
-            <AlertDialogHeader fontSize="md">Delete follow-up?</AlertDialogHeader>
-            <AlertDialogBody fontSize="sm" color="gray.600">
+          <AlertDialogContent rounded="2xl" mx={4} shadow="2xl">
+            <AlertDialogHeader fontSize="md" fontFamily="heading">Delete follow-up?</AlertDialogHeader>
+            <AlertDialogBody fontSize="sm" color="gray.500">
               This cannot be undone.
             </AlertDialogBody>
             <AlertDialogFooter>

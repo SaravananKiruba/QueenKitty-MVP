@@ -41,94 +41,118 @@ export default function Payments() {
   useEffect(() => { load(scope); }, [scope, load]);
 
   const onChanged = () => load(scope);
-
   const scopeIndex = SCOPES.findIndex((s) => s.key === scope);
 
   return (
-    <Box maxW="md" mx="auto" px={4} pt={6} pb={28} minH="100vh">
-      <HStack justify="space-between" mb={4}>
-        <Button as={RouterLink} to="/" variant="ghost" size="sm">← Back</Button>
-        <Heading size="md">Payments</Heading>
-        <Box w="60px" />
-      </HStack>
-
-      {summary && (summary.pending_count > 0) && (
-        <Card rounded="2xl" bg="red.50" mb={4} borderColor="red.100" borderWidth="1px">
-          <CardBody py={3}>
-            <HStack justify="space-between">
-              <Box>
-                <Text fontSize="xs" color="red.700">PENDING</Text>
-                <Heading size="md" color="red.700">₹{formatMoney(summary.total_pending)}</Heading>
-              </Box>
-              <Box textAlign="right">
-                <Text fontSize="xs" color="red.700">{summary.pending_count} order(s)</Text>
-                {summary.due_today_count > 0 && (
-                  <Badge colorScheme="red" mt={1}>{summary.due_today_count} due today</Badge>
-                )}
-              </Box>
-            </HStack>
-          </CardBody>
-        </Card>
-      )}
-
-      <Tabs
-        index={scopeIndex >= 0 ? scopeIndex : 0}
-        onChange={(i) => setScope(SCOPES[i].key)}
-        variant="soft-rounded"
-        colorScheme="brand"
-        isLazy
+    <Box minH={{ md: '100vh' }}>
+      {/* Gradient header */}
+      <Box
+        bgGradient="linear(135deg, #E91E63 0%, #FF6B9D 100%)"
+        px={5} pt={{ base: 7, md: 8 }} pb={16}
       >
-        <TabList overflowX="auto" overflowY="hidden" pb={2} sx={{ scrollbarWidth: 'none' }}>
-          {SCOPES.map((s) => (
-            <Tab key={s.key} flexShrink={0} fontSize="sm">{s.label}</Tab>
-          ))}
-        </TabList>
-        <TabPanels>
-          {SCOPES.map((s) => (
-            <TabPanel key={s.key} px={0} pt={3}>
-              {loading ? (
-                <Flex justify="center" py={10}><Spinner color="brand.500" /></Flex>
-              ) : error ? (
-                <Card><CardBody><Text color="red.500" fontSize="sm">{error}</Text></CardBody></Card>
-              ) : items.length === 0 ? (
-                <Card rounded="2xl"><CardBody>
-                  <Text color="gray.600" fontSize="sm">
-                    {s.key === 'due_today'
-                      ? 'No pending payments due today. Nice!'
-                      : s.key === 'pending'
-                        ? 'No pending payments. All cleared.'
-                        : 'No orders yet. Tap + to add one.'}
+        <Heading size="lg" color="white" fontFamily="heading">Payments</Heading>
+        {summary && summary.pending_count > 0 ? (
+          <Text fontSize="sm" color="whiteAlpha.800" mt={0.5}>
+            ₹{formatMoney(summary.total_pending)} pending · {summary.pending_count} order(s)
+          </Text>
+        ) : (
+          <Text fontSize="sm" color="whiteAlpha.800" mt={0.5}>Track and collect payments</Text>
+        )}
+      </Box>
+
+      {/* Content lifts over gradient */}
+      <Box
+        bg="#FFF5F8"
+        borderTopLeftRadius="28px"
+        borderTopRightRadius="28px"
+        mt="-14px"
+        pt={4}
+        px={4}
+        pb={6}
+        minH="60vh"
+      >
+        {summary && summary.pending_count > 0 && (
+          <Card rounded="2xl" bg="red.50" mb={4} borderColor="red.100" borderWidth="1px" shadow="none">
+            <CardBody py={3}>
+              <HStack justify="space-between">
+                <Box>
+                  <Text fontSize="xs" color="red.700" fontWeight="600" textTransform="uppercase" letterSpacing="wider">
+                    Total Pending
                   </Text>
-                </CardBody></Card>
-              ) : (
-                <Stack spacing={3}>
-                  {items.map((o) => (
-                    <OrderCard
-                      key={o.id}
-                      order={o}
-                      onPay={() => setPaymentTarget(o)}
-                      onChanged={onChanged}
-                    />
-                  ))}
-                </Stack>
-              )}
-            </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
+                  <Heading size="md" color="red.600">₹{formatMoney(summary.total_pending)}</Heading>
+                </Box>
+                <Box textAlign="right">
+                  <Text fontSize="sm" color="red.600" fontWeight="500">{summary.pending_count} order(s)</Text>
+                  {summary.due_today_count > 0 && (
+                    <Badge colorScheme="red" mt={1} rounded="full">{summary.due_today_count} due today</Badge>
+                  )}
+                </Box>
+              </HStack>
+            </CardBody>
+          </Card>
+        )}
+
+        <Tabs
+          index={scopeIndex >= 0 ? scopeIndex : 0}
+          onChange={(i) => setScope(SCOPES[i].key)}
+          variant="soft-rounded"
+          colorScheme="brand"
+          isLazy
+        >
+          <TabList overflowX="auto" overflowY="hidden" pb={2} sx={{ scrollbarWidth: 'none' }}>
+            {SCOPES.map((s) => (
+              <Tab key={s.key} flexShrink={0} fontSize="sm" fontWeight="500">{s.label}</Tab>
+            ))}
+          </TabList>
+          <TabPanels>
+            {SCOPES.map((s) => (
+              <TabPanel key={s.key} px={0} pt={3}>
+                {loading ? (
+                  <Flex justify="center" py={10}><Spinner color="brand.500" /></Flex>
+                ) : error ? (
+                  <Card><CardBody><Text color="red.500" fontSize="sm">{error}</Text></CardBody></Card>
+                ) : items.length === 0 ? (
+                  <Card rounded="2xl"><CardBody>
+                    <Text color="gray.500" fontSize="sm">
+                      {s.key === 'due_today'
+                        ? 'No pending payments due today. Nice!'
+                        : s.key === 'pending'
+                          ? 'No pending payments. All cleared.'
+                          : 'No orders yet. Tap + to add one.'}
+                    </Text>
+                  </CardBody></Card>
+                ) : (
+                  <Stack spacing={3}>
+                    {items.map((o) => (
+                      <OrderCard
+                        key={o.id}
+                        order={o}
+                        onPay={() => setPaymentTarget(o)}
+                        onChanged={onChanged}
+                      />
+                    ))}
+                  </Stack>
+                )}
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
+      </Box>
 
       <IconButton
         aria-label="Add order"
-        icon={<Text fontSize="2xl" lineHeight="1" fontWeight="bold">+</Text>}
+        icon={<Text fontSize="2xl" lineHeight="1" fontWeight="bold" color="white">+</Text>}
         position="fixed"
-        bottom="6"
-        right={{ base: 6, md: 'calc(50% - 200px)' }}
+        bottom={{ base: '80px', md: '32px' }}
+        right={{ base: 5, md: 5 }}
         size="lg"
         rounded="full"
-        colorScheme="brand"
-        shadow="lg"
-        h="60px"
-        w="60px"
+        bgGradient="linear(135deg, brand.500, brand.400)"
+        shadow="0 4px 20px rgba(233,30,99,0.45)"
+        h="60px" w="60px"
+        _hover={{ shadow: '0 6px 24px rgba(233,30,99,0.55)', transform: 'scale(1.06)', bgGradient: 'linear(135deg, brand.600, brand.500)' }}
+        _active={{ transform: 'scale(0.97)' }}
+        transition="all 0.2s"
         onClick={addSheet.onOpen}
       />
 

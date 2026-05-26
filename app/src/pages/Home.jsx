@@ -1,10 +1,9 @@
 import {
   Box, Heading, Text, Stack, Button, HStack, Avatar, IconButton, Spinner,
   Tabs, TabList, TabPanels, Tab, TabPanel, Badge, useDisclosure, Card, CardBody,
-  Flex, Menu, MenuButton, MenuList, MenuItem, MenuDivider,
+  Flex,
 } from '@chakra-ui/react';
 import { useCallback, useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { followupsApi } from '@/lib/followups';
 import FollowupCard from '@/components/FollowupCard';
@@ -18,17 +17,16 @@ const SCOPES = [
 ];
 
 export default function Home() {
-  const { user, logout } = useAuth();
-  const [scope, setScope]       = useState('today');
-  const [items, setItems]       = useState([]);
-  const [counts, setCounts]     = useState({ today: 0, upcoming: 0, overdue: 0, done: 0 });
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
+  const { user } = useAuth();
+  const [scope, setScope]     = useState('today');
+  const [items, setItems]     = useState([]);
+  const [counts, setCounts]   = useState({ today: 0, upcoming: 0, overdue: 0, done: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const load = useCallback(async (next = scope) => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
       const data = await followupsApi.list(next);
       setItems(data.followups || []);
@@ -42,9 +40,8 @@ export default function Home() {
 
   useEffect(() => { load(scope); }, [scope, load]);
 
-  const refreshCounts = () => {
+  const refreshCounts = () =>
     followupsApi.list(scope).then((d) => setCounts(d.counts || {})).catch(() => {});
-  };
 
   const handleCreated = () => load(scope);
   const handleChanged = (updated) => {
@@ -61,91 +58,142 @@ export default function Home() {
   };
 
   const scopeIndex = SCOPES.findIndex((s) => s.key === scope);
+  const todayDate = new Date().toLocaleDateString('en-IN', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  });
 
   return (
-    <Box maxW="md" mx="auto" px={4} pt={6} pb={28} minH="100vh">
-      <HStack justify="space-between" mb={5}>
-        <HStack>
-          <Avatar name={user?.name} bg="brand.500" color="white" />
-          <Box>
-            <Text fontSize="sm" color="gray.500">Welcome back</Text>
-            <Heading size="md">{user?.name}</Heading>
-          </Box>
-        </HStack>
-        <HStack spacing={1}>
-          <Button as={RouterLink} to="/repeats" size="sm" variant="ghost">Repeats</Button>
-          <Button as={RouterLink} to="/payments" size="sm" variant="ghost">Payments</Button>
-          <Menu>
-            <MenuButton as={IconButton} variant="ghost" size="sm" aria-label="More"
-              icon={<Text fontSize="lg" lineHeight="1">⋮</Text>} />
-            <MenuList>
-              <MenuItem as={RouterLink} to="/customers">Customers</MenuItem>
-              <MenuItem as={RouterLink} to="/settings">Settings</MenuItem>
-              <MenuDivider />
-              <MenuItem onClick={logout}>Log out</MenuItem>
-            </MenuList>
-          </Menu>
-        </HStack>
-      </HStack>
-
-      <Tabs
-        index={scopeIndex >= 0 ? scopeIndex : 0}
-        onChange={(i) => setScope(SCOPES[i].key)}
-        variant="soft-rounded"
-        colorScheme="brand"
-        isLazy
+    <Box minH={{ md: '100vh' }}>
+      {/* Gradient hero header */}
+      <Box
+        bgGradient="linear(135deg, #E91E63 0%, #FF6B9D 100%)"
+        px={5}
+        pt={{ base: 7, md: 8 }}
+        pb={24}
       >
-        <TabList overflowX="auto" overflowY="hidden" pb={2} sx={{ scrollbarWidth: 'none' }}>
-          {SCOPES.map((s) => (
-            <Tab key={s.key} flexShrink={0} fontSize="sm">
-              {s.label}
-              {counts[s.key] > 0 && (
-                <Badge ml={2} colorScheme={s.key === 'overdue' ? 'red' : 'brand'} rounded="full">
-                  {counts[s.key]}
-                </Badge>
-              )}
-            </Tab>
-          ))}
-        </TabList>
+        <HStack justify="space-between" align="start">
+          <Box>
+            <Text
+              fontSize="xs"
+              color="whiteAlpha.800"
+              fontWeight="600"
+              textTransform="uppercase"
+              letterSpacing="wider"
+            >
+              {todayDate}
+            </Text>
+            <Heading
+              size="lg"
+              color="white"
+              fontFamily="heading"
+              mt={1}
+            >
+              Hey, {user?.name?.split(' ')[0]} 👋
+            </Heading>
+            <Text fontSize="sm" color="whiteAlpha.800" mt={0.5}>
+              Here are your follow-ups
+            </Text>
+          </Box>
+          <Avatar
+            name={user?.name}
+            bg="whiteAlpha.300"
+            color="white"
+            size="md"
+            border="2px solid"
+            borderColor="whiteAlpha.400"
+          />
+        </HStack>
 
-        <TabPanels>
-          {SCOPES.map((s) => (
-            <TabPanel key={s.key} px={0} pt={3}>
-              {loading ? (
-                <Flex justify="center" py={10}><Spinner color="brand.500" /></Flex>
-              ) : error ? (
-                <Card><CardBody><Text color="red.500" fontSize="sm">{error}</Text></CardBody></Card>
-              ) : items.length === 0 ? (
-                <EmptyState scope={s.key} onAdd={onOpen} />
-              ) : (
-                <Stack spacing={3}>
-                  {items.map((f) => (
-                    <FollowupCard
-                      key={f.id}
-                      followup={f}
-                      onChanged={handleChanged}
-                      onDeleted={handleDeleted}
-                    />
-                  ))}
-                </Stack>
-              )}
-            </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
+        {/* Quick-stat chips */}
+        <HStack mt={6} spacing={2} overflowX="auto" sx={{ scrollbarWidth: 'none' }}>
+          <StatChip label="Today"    value={counts.today}    accent="rgba(255,255,255,0.22)" />
+          <StatChip label="Overdue"  value={counts.overdue}  accent="rgba(255,80,80,0.32)" />
+          <StatChip label="Upcoming" value={counts.upcoming} accent="rgba(255,255,255,0.14)" />
+        </HStack>
+      </Box>
 
+      {/* Card panel pulls up over the gradient */}
+      <Box
+        bg="#FFF5F8"
+        borderTopLeftRadius="28px"
+        borderTopRightRadius="28px"
+        mt="-22px"
+        pt={5}
+        px={4}
+        pb={6}
+        minH="60vh"
+      >
+        <Tabs
+          index={scopeIndex >= 0 ? scopeIndex : 0}
+          onChange={(i) => setScope(SCOPES[i].key)}
+          variant="soft-rounded"
+          colorScheme="brand"
+          isLazy
+        >
+          <TabList overflowX="auto" overflowY="hidden" pb={2} sx={{ scrollbarWidth: 'none' }}>
+            {SCOPES.map((s) => (
+              <Tab key={s.key} flexShrink={0} fontSize="sm" fontWeight="500">
+                {s.label}
+                {counts[s.key] > 0 && (
+                  <Badge
+                    ml={2}
+                    colorScheme={s.key === 'overdue' ? 'red' : 'brand'}
+                    rounded="full"
+                    fontSize="10px"
+                  >
+                    {counts[s.key]}
+                  </Badge>
+                )}
+              </Tab>
+            ))}
+          </TabList>
+
+          <TabPanels>
+            {SCOPES.map((s) => (
+              <TabPanel key={s.key} px={0} pt={3}>
+                {loading ? (
+                  <Flex justify="center" py={10}><Spinner color="brand.500" /></Flex>
+                ) : error ? (
+                  <Card><CardBody><Text color="red.500" fontSize="sm">{error}</Text></CardBody></Card>
+                ) : items.length === 0 ? (
+                  <EmptyState scope={s.key} onAdd={onOpen} />
+                ) : (
+                  <Stack spacing={3}>
+                    {items.map((f) => (
+                      <FollowupCard
+                        key={f.id}
+                        followup={f}
+                        onChanged={handleChanged}
+                        onDeleted={handleDeleted}
+                      />
+                    ))}
+                  </Stack>
+                )}
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
+      </Box>
+
+      {/* Floating action button */}
       <IconButton
         aria-label="Add follow-up"
-        icon={<Text fontSize="2xl" lineHeight="1" fontWeight="bold">+</Text>}
+        icon={<Text fontSize="2xl" lineHeight="1" fontWeight="bold" color="white">+</Text>}
         position="fixed"
-        bottom="6"
-        right={{ base: 6, md: 'calc(50% - 200px)' }}
+        bottom={{ base: '80px', md: '32px' }}
+        right={{ base: 5, md: 5 }}
         size="lg"
         rounded="full"
-        colorScheme="brand"
-        shadow="lg"
-        h="60px"
-        w="60px"
+        bgGradient="linear(135deg, brand.500, brand.400)"
+        shadow="0 4px 20px rgba(233,30,99,0.45)"
+        h="60px" w="60px"
+        _hover={{
+          shadow: '0 6px 24px rgba(233,30,99,0.55)',
+          transform: 'scale(1.06)',
+          bgGradient: 'linear(135deg, brand.600, brand.500)',
+        }}
+        _active={{ transform: 'scale(0.97)' }}
+        transition="all 0.2s"
         onClick={onOpen}
       />
 
@@ -154,20 +202,41 @@ export default function Home() {
   );
 }
 
+function StatChip({ label, value, accent }) {
+  return (
+    <Box
+      flexShrink={0}
+      bg={accent}
+      rounded="2xl"
+      px={4}
+      py={2}
+      backdropFilter="blur(4px)"
+      border="1px solid"
+      borderColor="whiteAlpha.200"
+    >
+      <Text fontSize="10px" color="whiteAlpha.800" fontWeight="600" textTransform="uppercase" letterSpacing="wider">
+        {label}
+      </Text>
+      <Text fontSize="2xl" fontWeight="700" color="white" lineHeight="1.1">{value}</Text>
+    </Box>
+  );
+}
+
 function EmptyState({ scope, onAdd }) {
   const copy = {
-    today:    { title: 'Nothing for today', body: 'Add a customer to start tracking follow-ups.' },
-    overdue:  { title: 'No overdue follow-ups', body: 'Great job staying on top of things.' },
-    upcoming: { title: 'No upcoming follow-ups', body: 'Plan a follow-up for next week.' },
-    done:     { title: 'No completed follow-ups yet', body: 'Marked-done items will appear here.' },
-  }[scope] || { title: 'Nothing here', body: '' };
+    today:    { emoji: '✨', title: 'All clear for today', body: 'Add a customer to start tracking follow-ups.' },
+    overdue:  { emoji: '🎉', title: 'No overdue follow-ups', body: 'Great job staying on top of things!' },
+    upcoming: { emoji: '📅', title: 'No upcoming follow-ups', body: 'Plan ahead by scheduling a follow-up.' },
+    done:     { emoji: '✅', title: 'No completed follow-ups yet', body: 'Marked-done items will appear here.' },
+  }[scope] || { emoji: '📋', title: 'Nothing here', body: '' };
 
   return (
-    <Card rounded="2xl" shadow="sm">
+    <Card rounded="2xl">
       <CardBody>
         <Stack spacing={3} align="start">
-          <Heading size="sm">{copy.title}</Heading>
-          <Text color="gray.600" fontSize="sm">{copy.body}</Text>
+          <Text fontSize="3xl">{copy.emoji}</Text>
+          <Heading size="sm" fontFamily="heading">{copy.title}</Heading>
+          <Text color="gray.500" fontSize="sm">{copy.body}</Text>
           {scope !== 'done' && (
             <Button onClick={onAdd} size="sm">+ Add follow-up</Button>
           )}
