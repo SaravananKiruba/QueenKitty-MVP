@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "cap:sync": "npm run build:mobile && npx cap sync android",
     "cap:open": "npx cap open android",
-    "cap:assets": "npx capacitor-assets generate --android --pwa --assetPath assets"
+    "cap:assets": "npx capacitor-assets generate --android --assetPath assets --iconBackgroundColor \"#FFFFFF\""
   },
   "dependencies": {
     "@capacitor/android": "^8.3.4",

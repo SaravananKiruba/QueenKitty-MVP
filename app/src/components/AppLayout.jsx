@@ -154,8 +154,12 @@ export function AppLayout({ children }) {
       {/* ── Main Content ── */}
       <Box
         ml={{ base: 0, md: '220px' }}
-        pb={{ base: '72px', md: 0 }}
         minH="100vh"
+        sx={{
+          '@media screen and (max-width: 767px)': {
+            paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px))',
+          },
+        }}
       >
         <Box
           maxW={{ base: '100%', md: '2xl' }}
@@ -170,56 +174,61 @@ export function AppLayout({ children }) {
         display={{ base: 'flex', md: 'none' }}
         position="fixed"
         bottom={0} left={0} right={0}
-        h="64px"
         bg="white"
         borderTop="1px solid"
         borderColor="gray.100"
-        shadow="0 -4px 24px rgba(233,30,99,0.08)"
+        shadow="0 -2px 16px rgba(0,0,0,0.07)"
         zIndex={200}
-        alignItems="stretch"
+        flexDir="column"
         sx={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        {NAV.map(({ to, label, Icon }) => {
-          const active = isActive(to);
-          return (
-            <Box
-              key={to}
-              as={Link}
-              to={to}
-              flex={1}
-              display="flex"
-              flexDir="column"
-              alignItems="center"
-              justifyContent="center"
-              gap="3px"
-              color={active ? 'brand.500' : 'gray.400'}
-              _hover={{ color: 'brand.400', textDecoration: 'none' }}
-              transition="color 0.15s"
-              position="relative"
-            >
-              {active && (
-                <Box
-                  position="absolute"
-                  top={0}
-                  left="25%" right="25%"
-                  h="2px"
-                  bgGradient="linear(90deg, brand.400, brand.600)"
-                  rounded="full"
-                />
-              )}
-              <Icon size={20} />
-              <Text
-                fontSize="9px"
-                fontWeight={active ? '700' : '500'}
-                lineHeight="1"
-                letterSpacing="0.5px"
-                textTransform="uppercase"
+        <HStack h="56px" spacing={0} px={1}>
+          {NAV.map(({ to, label, Icon }) => {
+            const active = isActive(to);
+            return (
+              <Box
+                key={to}
+                as={Link}
+                to={to}
+                flex={1}
+                display="flex"
+                flexDir="column"
+                alignItems="center"
+                justifyContent="center"
+                gap="2px"
+                py={1}
+                color={active ? 'brand.500' : 'gray.400'}
+                _hover={{ textDecoration: 'none' }}
+                transition="color 0.12s"
+                sx={{
+                  WebkitTapHighlightColor: 'transparent',
+                  touchAction: 'manipulation',
+                }}
               >
-                {label}
-              </Text>
-            </Box>
-          );
-        })}
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  w="48px"
+                  h="26px"
+                  rounded="full"
+                  bg={active ? 'brand.50' : 'transparent'}
+                  transition="background 0.15s"
+                >
+                  <Icon size={active ? 22 : 20} />
+                </Box>
+                <Text
+                  fontSize="10px"
+                  fontWeight={active ? '700' : '500'}
+                  lineHeight="1"
+                  letterSpacing="0.1px"
+                >
+                  {label}
+                </Text>
+              </Box>
+            );
+          })}
+        </HStack>
       </Box>
     </Box>
   );

@@ -78,7 +78,7 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
                   fontSize="11px"
                   fontWeight="600"
                 >
-                  {followup.is_completed ? 'âœ“ Done' : relativeDay(followup.followup_date)}
+                  {followup.is_completed ? '✓ Done' : relativeDay(followup.followup_date)}
                 </Badge>
                 <Text fontSize="xs" color="gray.400" fontWeight="500">{formatDate(followup.followup_date)}</Text>
               </HStack>
@@ -100,7 +100,7 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
               <MenuButton as={IconButton} variant="ghost" size="sm" aria-label="More"
                 color="gray.400"
                 _hover={{ color: 'gray.600', bg: 'gray.50' }}
-                icon={<Text fontSize="lg" lineHeight="1">â‹®</Text>} />
+                icon={<Text fontSize="lg" lineHeight="1">⋮</Text>} />
               <MenuList shadow="lg" rounded="xl">
                 <MenuItem rounded="lg" onClick={() => act(() => followupsApi.snooze(followup.id, 1))}>Snooze 1 day</MenuItem>
                 <MenuItem rounded="lg" onClick={() => act(() => followupsApi.snooze(followup.id, 3))}>Snooze 3 days</MenuItem>
@@ -144,7 +144,7 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
                 flex="1"
                 rounded="lg"
               >
-                âœ“ Done
+                ✓ Done
               </Button>
             </HStack>
           )}
