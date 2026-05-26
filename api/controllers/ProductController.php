@@ -32,8 +32,8 @@ final class ProductController
         $params = [$userId];
 
         $sql = 'SELECT id, user_id, product_name, product_code, category,
-                       mrp, default_price, image_url, source, is_active,
-                       last_synced_at, created_at, updated_at
+                       mrp, default_price, image_url, is_active,
+                       created_at, updated_at
                   FROM products
                  WHERE is_active = 1
                    AND (user_id IS NULL OR user_id = ?)';
@@ -77,8 +77,8 @@ final class ProductController
 
         $stmt = db()->prepare(
             'INSERT INTO products
-                (user_id, product_name, product_code, category, mrp, default_price, source)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+                (user_id, product_name, product_code, category, mrp, default_price)
+             VALUES (?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $userId,
@@ -87,7 +87,6 @@ final class ProductController
             $data['category'],
             $data['mrp'],
             $data['default_price'],
-            'manual',
         ]);
         $id  = (int) db()->lastInsertId();
         $row = self::fetchOwned($userId, $id);
@@ -172,7 +171,7 @@ final class ProductController
     {
         $stmt = db()->prepare(
             'SELECT id, user_id, product_name, product_code, category,
-                    mrp, default_price, image_url, source, is_active, created_at, updated_at
+                    mrp, default_price, image_url, is_active, created_at, updated_at
                FROM products
               WHERE id = ? AND user_id = ? LIMIT 1'
         );

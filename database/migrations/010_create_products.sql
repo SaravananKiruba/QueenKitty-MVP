@@ -1,34 +1,28 @@
 -- 010_create_products.sql
--- Product master table for Feature 2 (Product Master + Searchable Product Picker).
+-- Product master table (Feature 2 — Product Master + Searchable Product Picker).
 --
 -- TENANT RULES:
---   user_id IS NULL  → system/global product (visible to all sellers, read-only)
---   user_id = N      → seller-custom product (visible to that seller only)
+--   user_id IS NULL  → system product managed by admin via DB — visible to ALL sellers
+--   user_id = N      → seller-custom product — visible only to that seller
 --
--- FK to users is conditional: enforced only when user_id IS NOT NULL.
--- Use a trigger-less workaround — FK is on the nullable column; MySQL allows
--- NULL to bypass the FK constraint, which is exactly what we need here.
+-- Admin adds system products directly through phpMyAdmin / DB migration.
+-- No sync engine. No CSV. No Google Sheet. Simple and cheap-hosting safe.
 --
 -- BACKWARD COMPATIBLE: no changes to existing tables.
 
 CREATE TABLE IF NOT EXISTS `products` (
-  `id`                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id`           BIGINT UNSIGNED DEFAULT NULL
-                        COMMENT 'NULL = system product visible to all; set = seller-custom',
-  `product_name`      VARCHAR(160) NOT NULL,
-  `product_code`      VARCHAR(60)  DEFAULT NULL,
-  `category`          ENUM('kitchen','bottle','storage','other') NOT NULL DEFAULT 'other',
-  `mrp`               DECIMAL(10,2) DEFAULT NULL,
-  `default_price`     DECIMAL(10,2) DEFAULT NULL,
-  `image_url`         VARCHAR(500)  DEFAULT NULL,
-  `source`            VARCHAR(60)   NOT NULL DEFAULT 'manual'
-                        COMMENT 'manual | google_sheet | csv | json',
-  `is_active`         TINYINT(1)    NOT NULL DEFAULT 1,
-  `last_synced_at`    TIMESTAMP     NULL DEFAULT NULL,
-  `sync_source`       VARCHAR(120)  DEFAULT NULL,
-  `last_price_change` TIMESTAMP     NULL DEFAULT NULL,
-  `created_at`        TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at`        TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id`       BIGINT UNSIGNED DEFAULT NULL
+                    COMMENT 'NULL = admin system product; set = seller-custom',
+  `product_name`  VARCHAR(160) NOT NULL,
+  `product_code`  VARCHAR(60)  DEFAULT NULL,
+  `category`      ENUM('kitchen','bottle','storage','other') NOT NULL DEFAULT 'other',
+  `mrp`           DECIMAL(10,2) DEFAULT NULL,
+  `default_price` DECIMAL(10,2) DEFAULT NULL,
+  `image_url`     VARCHAR(500)  DEFAULT NULL,
+  `is_active`     TINYINT(1)    NOT NULL DEFAULT 1,
+  `created_at`    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_products_user`   (`user_id`),
   KEY `idx_products_name`   (`product_name`),
