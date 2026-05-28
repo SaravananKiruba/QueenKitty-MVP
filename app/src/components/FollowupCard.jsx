@@ -56,13 +56,13 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
       onDeleted?.(followup.id);
     } finally {
       setBusy(false);
-    
+    }
+  };
 
   const handleOrderCreated = async (order) => {
     closeOrder();
     // Mark followup as done after order is created
     await act(() => followupsApi.done(followup.id));
-  };}
   };
 
   return (
@@ -142,7 +142,11 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
                 borderColor="gray.200"
               >
                 Call
-              </Button>openOrder}
+              </Button>
+              <Button
+                colorScheme="green"
+                size="sm"
+                onClick={openOrder}
                 flex="1"
                 rounded="lg"
               >
@@ -164,13 +168,7 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
           phone: followup.customer_phone,
         }}
         prefillProduct={followup.product_interest}
-      /
-                ✓ Done
-              </Button>
-            </HStack>
-          )}
-        </Stack>
-      </CardBody>
+      />
 
       <AlertDialog isOpen={confirmOpen} leastDestructiveRef={cancelRef} onClose={closeConfirm} isCentered>
         <AlertDialogOverlay>
