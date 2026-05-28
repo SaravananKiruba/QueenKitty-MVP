@@ -2,10 +2,13 @@
 /**
  * ProductController — product master CRUD + search.
  *
- * Tenant-safety rules (CLAUDE.md multi-tenant):
- *   READ  → system products (user_id IS NULL) + seller's own products
+ * Tenant-safety rules (CLAUDE.md multi-tenant + seller groups):
+ *   READ  → 3-tier visibility:
+ *           1. Global products (user_id IS NULL, group_id IS NULL)
+ *           2. Group products (group_id = seller's group_id)
+ *           3. Seller's own products (user_id = seller's id)
  *   WRITE → seller can only create/edit/delete their OWN products
- *           Super-admin manages system products (user_id IS NULL) via DB/migration.
+ *           Super-admin manages global/group products via DB/migration.
  *
  * Every query that writes must filter by Auth::userId().
  */
@@ -17,26 +20,38 @@ final class ProductController
     /**
      * GET /products?q=&limit=
      *
-     * Returns:
-     *   - All system products (user_id IS NULL, is_active = 1) matching q
-     *   - All seller-custom products owned by authenticated user matching q
+     * Returns (3-tier visibility):
+     *   1. Global products (user_id IS NULL, group_id IS NULL)
+     *   2. Group products (group_id = seller's group)
+     *   3. Seller's own custom products (user_id = seller)
      *
      * q: partial match on product_name or product_code (case-insensitive).
      */
     public function index(): void
     {
-        $userId = Auth::userId();
-        $q      = trim((string) Request::query('q', ''));
-        $limit  = min(100, max(1, (int) Request::query('limit', 50)));
+        $userId  = Auth::userId();
+        $groupId = self::getUserGroupId($userId);
+        $q       = trim((string) Request::query('q', ''));
+        $limit   = min(100, max(1, (int) Request::query('limit', 50)));
 
-        $params = [$userId];
+        $params = [];
 
-        $sql = 'SELECT id, user_id, product_name, product_code, category,
+        $sql = 'SELECT id, user_id, group_id, product_name, product_code, category,
                        mrp, default_price, image_url, is_active,
                        created_at, updated_at
                   FROM products
                  WHERE is_active = 1
-                   AND (user_id IS NULL OR user_id = ?)';
+                   AND (
+                     (user_id IS NULL AND group_id IS NULL)';  // Global products
+
+        if ($groupId !== null) {
+            $sql     .= ' OR group_id = ?';  // Group products
+            $params[] = $groupId;
+        }
+
+        $sql     .= ' OR user_id = ?';  // Seller's own products
+        $params[] = $userId;
+        $sql     .= ')';
 
         if ($q !== '') {
             $like     = '%' . $q . '%';
@@ -45,8 +60,12 @@ final class ProductController
             $params[] = $like;
         }
 
-        // System products first, then seller-custom, both sorted by name
-        $sql .= ' ORDER BY (user_id IS NULL) DESC, product_name ASC LIMIT ' . $limit;
+        // Global first, then group, then seller-custom, all sorted by name
+        $sql .= ' ORDER BY
+                    (user_id IS NULL AND group_id IS NULL) DESC,
+                    (group_id IS NOT NULL) DESC,
+                    product_name ASC
+                  LIMIT ' . $limit;
 
         $stmt = db()->prepare($sql);
         $stmt->execute($params);
@@ -57,7 +76,9 @@ final class ProductController
             $row['mrp']           = $row['mrp']           !== null ? (float) $row['mrp'] : null;
             $row['default_price'] = $row['default_price'] !== null ? (float) $row['default_price'] : null;
             $row['is_active']     = (bool) $row['is_active'];
-            $row['is_system']     = $row['user_id'] === null;
+            $row['is_global']     = $row['user_id'] === null && $row['group_id'] === null;
+            $row['is_group']      = $row['user_id'] === null && $row['group_id'] !== null;
+            $row['is_custom']     = $row['user_id'] !== null;
         }
         unset($row);
 
@@ -220,5 +241,17 @@ final class ProductController
     private static function money(mixed $v): float
     {
         return round(max(0.0, (float) $v), 2);
+    }
+
+    /**
+     * Get seller's group_id from users table.
+     * Returns NULL if user is admin or has no group.
+     */
+    private static function getUserGroupId(int $userId): ?int
+    {
+        $stmt = db()->prepare('SELECT group_id FROM users WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch();
+        return $row && $row['group_id'] !== null ? (int) $row['group_id'] : null;
     }
 }

@@ -18,8 +18,19 @@ const empty = {
 /**
  * Add an order. If `customer` is passed, name+phone are hidden and the
  * order is attached to that customer. Otherwise the API upserts a new one.
+ * 
+ * Smart UX Flow (CLAUDE.md):
+ * - prefillProduct: Pre-fill product_name from followup context
+ * - customer: Pre-fill customer details (read-only)
+ * - Auto-focus: First editable field gets focus
  */
-export default function AddOrderSheet({ isOpen, onClose, onCreated, customer = null }) {
+export default function AddOrderSheet({ 
+  isOpen, 
+  onClose, 
+  onCreated, 
+  customer = null, 
+  prefillProduct = '' 
+}) {
   const [form, setForm] = useState(empty);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -29,11 +40,16 @@ export default function AddOrderSheet({ isOpen, onClose, onCreated, customer = n
 
   useEffect(() => {
     if (isOpen) {
-      setForm({ ...empty, order_date: todayISO() });
+      setForm({ 
+        ...empty, 
+        order_date: todayISO(),
+        // Smart pre-fill from followup context
+        product_name: prefillProduct || empty.product_name,
+      });
       setErrors({});
       setTimeout(() => (customer ? productRef : nameRef).current?.focus(), 60);
     }
-  }, [isOpen, customer]);
+  }, [isOpen, customer, prefillProduct]);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 

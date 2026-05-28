@@ -7,6 +7,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import { followupsApi, whatsappLink, telLink } from '@/lib/followups';
+import AddOrderSheet from '@/components/AddOrderSheet';
 
 function formatDate(iso) {
   if (!iso) return '';
@@ -29,6 +30,7 @@ function relativeDay(iso) {
 export default function FollowupCard({ followup, onChanged, onDeleted }) {
   const [busy, setBusy] = useState(false);
   const { isOpen: confirmOpen, onOpen: openConfirm, onClose: closeConfirm } = useDisclosure();
+  const { isOpen: orderOpen, onOpen: openOrder, onClose: closeOrder } = useDisclosure();
   const cancelRef = useRef(null);
 
   const overdue = !followup.is_completed
@@ -54,7 +56,13 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
       onDeleted?.(followup.id);
     } finally {
       setBusy(false);
-    }
+    
+
+  const handleOrderCreated = async (order) => {
+    closeOrder();
+    // Mark followup as done after order is created
+    await act(() => followupsApi.done(followup.id));
+  };}
   };
 
   return (
@@ -134,16 +142,29 @@ export default function FollowupCard({ followup, onChanged, onDeleted }) {
                 borderColor="gray.200"
               >
                 Call
-              </Button>
-              <Button
-                size="sm"
-                variant="solid"
-                colorScheme="green"
-                isLoading={busy}
-                onClick={() => act(() => followupsApi.done(followup.id))}
+              </Button>openOrder}
                 flex="1"
                 rounded="lg"
               >
+                ✓ Done
+              </Button>
+            </HStack>
+          )}
+        </Stack>
+      </CardBody>
+
+      {/* Quick Order Sheet (pre-filled from followup) */}
+      <AddOrderSheet
+        isOpen={orderOpen}
+        onClose={closeOrder}
+        onCreated={handleOrderCreated}
+        customer={{
+          id: followup.customer_id,
+          name: followup.customer_name,
+          phone: followup.customer_phone,
+        }}
+        prefillProduct={followup.product_interest}
+      /
                 ✓ Done
               </Button>
             </HStack>
